@@ -9,14 +9,20 @@ namespace ParallelismExam1.Console
 {
     public class Process
     {
-        public async Task RunAsync()
+        public async Task<List<string>> GetDataAsync()
         {
-            await File.WriteAllTextAsync(@"data\text.txt", "Starting process");
-            for (int i = 0; i < 1000000; i++)
+            var lines = new List<string>();
+            using (var stream = new StreamReader(File.OpenRead(@"data.csv")))
             {
-                System.Console.WriteLine($"Processing {i} in thread {Thread.CurrentThread.ManagedThreadId}");
-                await File.AppendAllTextAsync(@"data\text.txt", $"Processing {i} in thread {Thread.CurrentThread.ManagedThreadId}");
+                string line;
+                while ((line = await stream.ReadLineAsync()) != null)
+                {
+                    await Task.Delay(5000);
+                    lines.Add(line);
+                }
             }
+
+            return lines;
         }
     }
 }
